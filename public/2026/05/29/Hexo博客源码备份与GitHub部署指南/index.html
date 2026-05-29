@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Hexo 博客源码备份与 GitHub Pages 部署指南 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="本文整理自 Hexo + GitHub Pages 搭建个人博客 类教程的常见流程，并补充源码备份说明。很多教程只教 hexo deploy，容易让人误以为 GitHub 上已有完整项目——实际上往往只有编译后的静态网站。  1. 先搞清楚：GitHub 上到底有什么Hexo 博客在本地的典型目录结构： 123456789blog&#x2F;                    ← 博客源码（应单独备份）">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo 博客源码备份与 GitHub Pages 部署指南">
+<meta property="og:url" content="http://example.com/2026/05/29/Hexo%E5%8D%9A%E5%AE%A2%E6%BA%90%E7%A0%81%E5%A4%87%E4%BB%BD%E4%B8%8EGitHub%E9%83%A8%E7%BD%B2%E6%8C%87%E5%8D%97/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="本文整理自 Hexo + GitHub Pages 搭建个人博客 类教程的常见流程，并补充源码备份说明。很多教程只教 hexo deploy，容易让人误以为 GitHub 上已有完整项目——实际上往往只有编译后的静态网站。  1. 先搞清楚：GitHub 上到底有什么Hexo 博客在本地的典型目录结构： 123456789blog&#x2F;                    ← 博客源码（应单独备份）">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-05-29T04:19:36.536Z">
+<meta property="article:modified_time" content="2026-05-29T03:20:37.287Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-Hexo博客源码备份与GitHub部署指南" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2026/05/29/Hexo%E5%8D%9A%E5%AE%A2%E6%BA%90%E7%A0%81%E5%A4%87%E4%BB%BD%E4%B8%8EGitHub%E9%83%A8%E7%BD%B2%E6%8C%87%E5%8D%97/" class="article-date">
+  <time class="dt-published" datetime="2026-05-29T04:19:36.536Z" itemprop="datePublished">2026-05-29</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      Hexo 博客源码备份与 GitHub Pages 部署指南
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>本文整理自 <a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/392994381">Hexo + GitHub Pages 搭建个人博客</a> 类教程的常见流程，并补充<strong>源码备份</strong>说明。很多教程只教 <code>hexo deploy</code>，容易让人误以为 GitHub 上已有完整项目——实际上往往只有编译后的静态网站。</p>
+<hr>
+<h2 id="1-先搞清楚：GitHub-上到底有什么"><a href="#1-先搞清楚：GitHub-上到底有什么" class="headerlink" title="1. 先搞清楚：GitHub 上到底有什么"></a>1. 先搞清楚：GitHub 上到底有什么</h2><p>Hexo 博客在本地的典型目录结构：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">blog/                    ← 博客源码（应单独备份）</span><br><span class="line">├── source/</span><br><span class="line">│   └── _posts/          ← 你写的 Markdown 文章</span><br><span class="line">├── _config.yml          ← 博客配置</span><br><span class="line">├── themes/              ← 主题（若自定义）</span><br><span class="line">├── package.json</span><br><span class="line">├── node_modules/        ← 依赖，不要提交</span><br><span class="line">├── public/              ← hexo generate 生成的静态文件</span><br><span class="line">└── .deploy_git/         ← hexo deploy 使用的临时 Git 目录</span><br></pre></td></tr></table></figure>
+
+<p>执行 <code>hexo deploy</code> 时，Hexo 会把 <code>public/</code> 里的内容推送到 <code>username.github.io</code> 仓库，供 GitHub Pages 展示。</p>
+<table>
+<thead>
+<tr>
+<th>内容</th>
+<th>本地</th>
+<th><code>username.github.io</code> 仓库</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>source/_posts/*.md</code> 文章原文</td>
+<td>✅</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><code>_config.yml</code> 配置</td>
+<td>✅</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><code>package.json</code>、主题源码</td>
+<td>✅</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>编译后的 <code>index.html</code>、CSS、JS</td>
+<td>✅（在 public&#x2F;）</td>
+<td>✅</td>
+</tr>
+</tbody></table>
+<p><strong>结论：</strong> <code>hexo deploy</code> 部署的是<strong>成品网站</strong>，不是<strong>写作源码</strong>。若只把 deploy 仓库当作备份，换电脑后无法直接继续用 Markdown 写博客。</p>
+<hr>
+<h2 id="2-推荐方案：两个仓库分工"><a href="#2-推荐方案：两个仓库分工" class="headerlink" title="2. 推荐方案：两个仓库分工"></a>2. 推荐方案：两个仓库分工</h2><table>
+<thead>
+<tr>
+<th>仓库</th>
+<th>用途</th>
+<th>更新方式</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>CSDNzjl.github.io</code></td>
+<td>存放编译后的静态网站，供 GitHub Pages 访问</td>
+<td><code>hexo deploy</code></td>
+</tr>
+<tr>
+<td><code>blog-source</code>（名称自定）</td>
+<td>存放 Hexo 源码，便于换机、协作、回滚</td>
+<td><code>git push</code></td>
+</tr>
+</tbody></table>
+<p>两个仓库互不替代：一个给人看，一个给自己改。</p>
+<hr>
+<h2 id="3-部署仓库配置（教程原有部分）"><a href="#3-部署仓库配置（教程原有部分）" class="headerlink" title="3. 部署仓库配置（教程原有部分）"></a>3. 部署仓库配置（教程原有部分）</h2><p>在博客根目录 <code>_config.yml</code> 末尾配置：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">deploy:</span></span><br><span class="line">  <span class="attr">type:</span> <span class="string">git</span></span><br><span class="line">  <span class="attr">repository:</span> <span class="string">git@github.com:你的用户名/你的用户名.github.io.git</span></span><br><span class="line">  <span class="attr">branch:</span> <span class="string">main</span></span><br></pre></td></tr></table></figure>
+
+<p>安装部署插件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pnpm add hexo-deployer-git</span><br><span class="line"><span class="comment"># 或 npm install hexo-deployer-git --save</span></span><br></pre></td></tr></table></figure>
+
+<p>常用命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">hexo clean          <span class="comment"># 清除缓存</span></span><br><span class="line">hexo generate       <span class="comment"># 生成静态文件到 public/</span></span><br><span class="line">hexo deploy         <span class="comment"># 推送到 github.io 仓库</span></span><br><span class="line"><span class="comment"># 可合并为：</span></span><br><span class="line">hexo clean &amp;&amp; hexo g -d</span><br></pre></td></tr></table></figure>
+
+<p>本地预览：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hexo server</span><br><span class="line"><span class="comment"># 浏览器访问 http://localhost:4000</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="4-源码仓库：从零初始化"><a href="#4-源码仓库：从零初始化" class="headerlink" title="4. 源码仓库：从零初始化"></a>4. 源码仓库：从零初始化</h2><p>在 Hexo 项目根目录（与 <code>_config.yml</code> 同级）操作。</p>
+<h3 id="4-1-创建-gitignore"><a href="#4-1-创建-gitignore" class="headerlink" title="4.1 创建 .gitignore"></a>4.1 创建 .gitignore</h3><p>以下内容<strong>不要</strong>提交到源码仓库：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">node_modules/</span><br><span class="line">public/</span><br><span class="line">.deploy_git/</span><br><span class="line">db.json</span><br><span class="line">.DS_Store</span><br></pre></td></tr></table></figure>
+
+<p>说明：</p>
+<ul>
+<li><code>node_modules/</code>：体积大，换机后 <code>pnpm install</code> 即可恢复</li>
+<li><code>public/</code>、<code>db.json</code>：每次 <code>hexo generate</code> 会重新生成</li>
+<li><code>.deploy_git/</code>：<code>hexo deploy</code> 内部使用的临时目录</li>
+</ul>
+<h3 id="4-2-初始化并推送到-GitHub"><a href="#4-2-初始化并推送到-GitHub" class="headerlink" title="4.2 初始化并推送到 GitHub"></a>4.2 初始化并推送到 GitHub</h3><p>先在 GitHub 新建一个<strong>空仓库</strong>（例如 <code>blog-source</code>），再执行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">git init</span><br><span class="line">git add .</span><br><span class="line">git commit -m <span class="string">&quot;init: hexo blog source&quot;</span></span><br><span class="line">git branch -M main</span><br><span class="line">git remote add origin git@github.com:你的用户名/blog-source.git</span><br><span class="line">git push -u origin main</span><br></pre></td></tr></table></figure>
+
+<p>之后每次改完文章或配置：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git add .</span><br><span class="line">git commit -m <span class="string">&quot;update: 新文章或配置说明&quot;</span></span><br><span class="line">git push</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="5-日常写作与发布流程"><a href="#5-日常写作与发布流程" class="headerlink" title="5. 日常写作与发布流程"></a>5. 日常写作与发布流程</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">1. 写/改文章     hexo new &quot;标题&quot;  或直接编辑 source/_posts/*.md</span><br><span class="line">2. 本地预览     hexo server</span><br><span class="line">3. 备份源码     git add . &amp;&amp; git commit &amp;&amp; git push   → blog-source</span><br><span class="line">4. 发布网站     hexo clean &amp;&amp; hexo g -d               → username.github.io</span><br></pre></td></tr></table></figure>
+
+<p>建议养成习惯：<strong>先 push 源码，再 deploy 网站</strong>。这样 GitHub 上始终有最新文章原文。</p>
+<hr>
+<h2 id="6-换电脑后如何恢复"><a href="#6-换电脑后如何恢复" class="headerlink" title="6. 换电脑后如何恢复"></a>6. 换电脑后如何恢复</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 1. 克隆源码仓库（不是 github.io）</span></span><br><span class="line">git <span class="built_in">clone</span> git@github.com:你的用户名/blog-source.git</span><br><span class="line"><span class="built_in">cd</span> blog-source</span><br><span class="line"></span><br><span class="line"><span class="comment"># 2. 安装依赖</span></span><br><span class="line">pnpm install</span><br><span class="line"><span class="comment"># 或 npm install</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 3. 本地预览，确认文章都在</span></span><br><span class="line">hexo server</span><br><span class="line"></span><br><span class="line"><span class="comment"># 4. 配置 SSH 密钥后，继续部署网站</span></span><br><span class="line">hexo deploy</span><br></pre></td></tr></table></figure>
+
+<p>若 <code>hexo deploy</code> 报错，检查：</p>
+<ul>
+<li><code>_config.yml</code> 中 <code>deploy.repository</code> 是否指向正确的 <code>username.github.io</code></li>
+<li>本机是否已配置 GitHub SSH 密钥（<code>ssh -T git@github.com</code> 测试）</li>
+</ul>
+<hr>
+<h2 id="7-常见问题"><a href="#7-常见问题" class="headerlink" title="7. 常见问题"></a>7. 常见问题</h2><h3 id="Q1：hexo-deploy-时-Git-只显示少量文件变更，是不是丢内容了？"><a href="#Q1：hexo-deploy-时-Git-只显示少量文件变更，是不是丢内容了？" class="headerlink" title="Q1：hexo deploy 时 Git 只显示少量文件变更，是不是丢内容了？"></a>Q1：<code>hexo deploy</code> 时 Git 只显示少量文件变更，是不是丢内容了？</h3><p>不是。Git 只提交<strong>有变化</strong>的文件，仓库里仍是完整网站。这是正常现象。</p>
+<h3 id="Q2：GitHub-上为什么看不到-md-文件？"><a href="#Q2：GitHub-上为什么看不到-md-文件？" class="headerlink" title="Q2：GitHub 上为什么看不到 .md 文件？"></a>Q2：GitHub 上为什么看不到 <code>.md</code> 文件？</h3><p>因为 deploy 仓库里只有 HTML。要看 Markdown 原文，请打开<strong>源码仓库</strong>（如 <code>blog-source</code>）。</p>
+<h3 id="Q3：能否只用一个仓库？"><a href="#Q3：能否只用一个仓库？" class="headerlink" title="Q3：能否只用一个仓库？"></a>Q3：能否只用一个仓库？</h3><p>可以，但不推荐新手使用。常见做法是：</p>
+<ul>
+<li><code>main</code> 分支：放源码</li>
+<li><code>gh-pages</code> 分支：放编译结果</li>
+</ul>
+<p>需要额外改 deploy 配置，且与「用户名.github.io」默认用 <code>main</code> 展示页面的习惯容易混淆。两个仓库更清晰。</p>
+<h3 id="Q4：文章里的图片怎么管理？"><a href="#Q4：文章里的图片怎么管理？" class="headerlink" title="Q4：文章里的图片怎么管理？"></a>Q4：文章里的图片怎么管理？</h3><p>开启 <code>post_asset_folder: true</code> 后，每篇文章可有独立资源目录。图片应放在 <code>source/</code> 下，随源码仓库一起 <code>git push</code>；<code>hexo generate</code> 会一并打包进 <code>public/</code> 并由 deploy 推上 Pages。</p>
+<hr>
+<h2 id="8-检查清单"><a href="#8-检查清单" class="headerlink" title="8. 检查清单"></a>8. 检查清单</h2><p>换电脑前确认：</p>
+<ul>
+<li><input disabled="" type="checkbox"> 源码仓库已 push 最新 <code>source/_posts/</code> 文章</li>
+<li><input disabled="" type="checkbox"> <code>_config.yml</code>、主题自定义已提交</li>
+<li><input disabled="" type="checkbox"> 文章引用的本地图片已在 <code>source/</code> 中并提交</li>
+<li><input disabled="" type="checkbox"> 知道 <code>username.github.io</code> 与 <code>blog-source</code> 各自用途</li>
+</ul>
+<hr>
+<h2 id="9-参考链接"><a href="#9-参考链接" class="headerlink" title="9. 参考链接"></a>9. 参考链接</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Hexo 官方文档 - 部署</a></li>
+<li><a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Hexo 官方文档 - 写作</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/392994381">知乎：Hexo + GitHub Pages 搭建教程</a></li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2026/05/29/Hexo%E5%8D%9A%E5%AE%A2%E6%BA%90%E7%A0%81%E5%A4%87%E4%BB%BD%E4%B8%8EGitHub%E9%83%A8%E7%BD%B2%E6%8C%87%E5%8D%97/" data-id="cuidTcJoo7CNtLUZe4szHGYNE" data-title="Hexo 博客源码备份与 GitHub Pages 部署指南" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2026/05/29/%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%83%A8%E7%BD%B2%E4%B8%8E%E4%BB%8E%E9%9B%B6%E6%90%AD%E5%BB%BA%E6%8C%87%E5%8D%97/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">虹光项目：服务器部署架构与从零搭建指南</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2026/05/">May 2026</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2026/05/29/Hexo%E5%8D%9A%E5%AE%A2%E6%BA%90%E7%A0%81%E5%A4%87%E4%BB%BD%E4%B8%8EGitHub%E9%83%A8%E7%BD%B2%E6%8C%87%E5%8D%97/">Hexo 博客源码备份与 GitHub Pages 部署指南</a>
+          </li>
+        
+          <li>
+            <a href="/2026/05/29/%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%83%A8%E7%BD%B2%E4%B8%8E%E4%BB%8E%E9%9B%B6%E6%90%AD%E5%BB%BA%E6%8C%87%E5%8D%97/">虹光项目：服务器部署架构与从零搭建指南</a>
+          </li>
+        
+          <li>
+            <a href="/2026/05/29/hello-world/">Hello World</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2026 John Doe<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>
