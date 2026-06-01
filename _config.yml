@@ -69,7 +69,6 @@ index_generator:
 default_category: uncategorized
 category_map:
   部署: deploy
-  Hexo: hexo
   博客: blog
   配置: config
 tag_map:

@@ -2,8 +2,14 @@
 title: Hexo 个性化配置完全指南
 date: 2026-05-29 14:00:00
 updated: 2026-05-29 18:00:00
-categories: [Hexo, 配置]
-tags: [Hexo, Butterfly, 主题, 插件, 配置]
+categories:
+  - Hexo
+tags:
+  - Hexo
+  - Butterfly
+  - 主题
+  - 插件
+  - 配置
 ---
 
 本文汇总 Hexo 博客除「写 Markdown 文章」之外的可定制项，并说明本仓库当前的实际配置，便于后续扩展。

@@ -2,8 +2,12 @@
 title: Hexo 博客源码备份与 GitHub Pages 部署指南
 date: 2026-05-29 10:00:00
 updated: 2026-05-29 16:00:00
-categories: [Hexo, 部署]
-tags: [GitHub Pages, 部署, 备份]
+categories:
+  - Hexo
+tags:
+  - 部署
+  - 备份
+  - Hexo
 ---
 
 本文整理自 [Hexo + GitHub Pages 搭建个人博客](https://zhuanlan.zhihu.com/p/392994381) 类教程的常见流程，并补充**源码备份**说明。很多教程只教 `hexo deploy`，容易让人误以为 GitHub 上已有完整项目——实际上往往只有编译后的静态网站。
