@@ -3,17 +3,17 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: Hexo
-subtitle: ''
-description: ''
-keywords:
-author: John Doe
-language: en
-timezone: ''
+title: CSDNzjl 的技术笔记
+subtitle: '服务器 · 部署 · 开发'
+description: '记录服务器部署、Hexo 博客搭建与开发实践'
+keywords: Hexo, 部署, GitHub Pages, Nginx, Spring Cloud, Butterfly
+author: CSDNzjl
+language: zh-CN
+timezone: 'Asia/Shanghai'
 
 # URL
 ## Set your site url here. For example, if you use GitHub Page, set url as 'https://username.github.io/project'
-url: http://example.com
+url: https://CSDNzjl.github.io
 permalink: :year/:month/:day/:title/
 permalink_defaults:
 pretty_urls:
@@ -40,17 +40,18 @@ external_link:
   exclude: ''
 filename_case: 0
 render_drafts: false
-post_asset_folder: false
+post_asset_folder: true
 relative_link: false
 future: true
-syntax_highlighter: highlight.js
 highlight:
+  enable: false
   line_number: true
   auto_detect: false
   tab_replace: ''
   wrap: true
   hljs: false
 prismjs:
+  enable: false
   preprocess: true
   line_number: true
   tab_replace: ''
@@ -67,7 +68,14 @@ index_generator:
 # Category & Tag
 default_category: uncategorized
 category_map:
+  部署: deploy
+  Hexo: hexo
+  博客: blog
+  配置: config
 tag_map:
+  GitHub Pages: github-pages
+  Spring Cloud: spring-cloud
+  Butterfly: butterfly
 
 # Metadata elements
 ## https://developer.mozilla.org/en-US/docs/Web/HTML/Element/meta
@@ -96,7 +104,29 @@ ignore:
 # Extensions
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
-theme: landscape
+theme: butterfly
+
+# hexo-generator-sitemap：自动生成站点地图
+sitemap:
+  path:
+    - sitemap.xml
+  rel: true
+
+# hexo-generator-searchdb：本地搜索数据
+search:
+  path: search.json
+  field: post
+  content: true
+  format: striptags
+
+# hexo-generator-feed：RSS / Atom 订阅
+feed:
+  type: atom
+  path: atom.xml
+  limit: 20
+  content: true
+  order_by: -date
+  autodiscovery: true
 
 # Deployment
 ## Docs: https://hexo.io/docs/one-command-deployment

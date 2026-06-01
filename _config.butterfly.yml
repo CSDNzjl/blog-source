@@ -1,0 +1,119 @@
+# Butterfly 主题配置（覆盖主题默认值）
+# 文档：https://butterfly.js.org/
+
+nav:
+  display_title: true
+  display_post_title: true
+  fixed: true
+
+menu:
+  首页: / || fas fa-home
+  归档: /archives/ || fas fa-archive
+  分类: /categories/ || fas fa-folder-open
+  标签: /tags/ || fas fa-tags
+  关于: /about/ || fas fa-user
+
+code_blocks:
+  theme: pale night
+  macStyle: true
+  height_limit: 400
+  word_wrap: true
+  copy: true
+  language: true
+  shrink: false
+  fullpage: false
+
+social:
+  fab fa-github: https://github.com/CSDNzjl || Github || '#24292e'
+
+avatar:
+  img: /images/avatar.png
+  effect: false
+
+aside:
+  card_author:
+    enable: true
+    description: 服务器 · 部署 · 开发
+    button:
+      enable: true
+      icon: fab fa-github
+      text: Follow Me
+      link: https://github.com/CSDNzjl
+  card_announcement:
+    enable: true
+    content: 欢迎来访 CSDNzjl 的技术笔记
+  card_recent_post:
+    enable: false
+  card_categories:
+    enable: false
+  card_tags:
+    enable: false
+  card_archives:
+    enable: false
+  card_webinfo:
+    enable: true
+    post_count: true
+    last_push_date: true
+
+busuanzi:
+  site_uv: false
+  site_pv: false
+  page_pv: false
+
+cover:
+  index_enable: false
+  aside_enable: true
+  archives_enable: true
+
+index_layout: 3
+
+index_post_content:
+  method: 3
+  length: 500
+
+subtitle:
+  enable: true
+  effect: true
+  sub: 服务器 · 部署 · 开发
+
+toc:
+  post: true
+  page: true
+  number: true
+  expand: false
+  style_simple: false
+  scroll_percent: true
+
+anchor:
+  auto_update: true
+  click_to_scroll: true
+
+post_copyright:
+  enable: true
+  author_href: https://github.com/CSDNzjl
+  license: CC BY-NC-SA 4.0
+  license_url: https://creativecommons.org/licenses/by-nc-sa/4.0/
+
+footer:
+  owner:
+    enable: true
+    since: 2026
+  custom_text: CSDNzjl 的技术笔记
+
+search:
+  use: local_search
+  placeholder: 搜索文章...
+  local_search:
+    preload: true
+    top_n_per_article: 2
+    pagination:
+      enable: true
+      hitsPerPage: 8
+
+pjax:
+  enable: true
+
+lazyload:
+  enable: true
+  field: site
+  blur: true

@@ -1,5 +1,9 @@
 ---
 title: Hexo 博客源码备份与 GitHub Pages 部署指南
+date: 2026-05-29 10:00:00
+updated: 2026-05-29 16:00:00
+categories: [Hexo, 部署]
+tags: [GitHub Pages, 部署, 备份]
 ---
 
 本文整理自 [Hexo + GitHub Pages 搭建个人博客](https://zhuanlan.zhihu.com/p/392994381) 类教程的常见流程，并补充**源码备份**说明。很多教程只教 `hexo deploy`，容易让人误以为 GitHub 上已有完整项目——实际上往往只有编译后的静态网站。
@@ -97,6 +101,7 @@ public/
 .deploy_git/
 db.json
 .DS_Store
+Thumbs.db
 ```
 
 说明：
@@ -117,6 +122,15 @@ git branch -M main
 git remote add origin git@github.com:你的用户名/blog-source.git
 git push -u origin main
 ```
+
+若 `git push` 被拒绝（远程已有 README 等初始提交），先合并再推送：
+
+```bash
+git pull origin main --allow-unrelated-histories --no-edit
+git push -u origin main
+```
+
+> **注意：** 执行 `git add .` 前请确认 `.gitignore` 已包含 `public/`、`.deploy_git/`、`db.json`，否则会把部署临时目录或生成物误提交进源码仓库。
 
 之后每次改完文章或配置：
 
@@ -188,6 +202,18 @@ hexo deploy
 ### Q4：文章里的图片怎么管理？
 
 开启 `post_asset_folder: true` 后，每篇文章可有独立资源目录。图片应放在 `source/` 下，随源码仓库一起 `git push`；`hexo generate` 会一并打包进 `public/` 并由 deploy 推上 Pages。
+
+### Q5：侧边栏目录能看见，但点击无法跳转？
+
+多见于同时安装了 `hexo-toc` 与 Butterfly 主题：前者把标题 `id` 写在 `<span>` 内，导致目录链接缺少 `href`。
+
+**处理：**
+
+1. 卸载 `hexo-toc`：`pnpm remove hexo-toc`
+2. 使用 Butterfly 自带目录（`_config.butterfly.yml` → `toc.post: true`）
+3. 执行 `hexo clean && hexo generate` 后重新部署
+
+更多主题与插件说明见《[Hexo 个性化配置完全指南](/2026/05/29/Hexo个性化配置完全指南/)》。
 
 ---
 
