@@ -249,6 +249,8 @@ ngrok http 8080
 
 - 401：Token / 登录态问题，与 ngrok 无关，先在同一网络下用 localhost 复现。
 - 502：ngrok 未启动、本地 dev server 已退出，或 ngrok 映射端口与 dev server 不一致。
+### 5.4 ngrok安全拦截
+- 对于GET请求，ngrok会在浏览器拦截，解决方案是将请求改为POST方法
 
 ---
 
