@@ -1,7 +1,7 @@
 ---
 title: 虹光项目：开放公网 IP 访问全流程
 date: 2026-06-05 10:00:00
-updated: 2026-06-05 14:00:00
+updated: 2026-06-05 16:00:00
 categories:
   - Kocel
 tags:
@@ -88,11 +88,67 @@ VUE_APP_BASE_API = 'http://192.168.2.206:3000'
 
 ```text
 局域网用户 ⇄ Nginx :80（静态页面）⇄ Gateway :3000 ⇄ 具体微服务
-                    ↑
-              页面与 API 不同源，但同属内网，浏览器不拦截
 ```
 
 > **要点**：前端不会在运行时查 Nacos；`VUE_APP_BASE_API` 在 `npm run build:prod` 时编译进 JS，改配置后必须重新打包并上传 `dist`。
+
+### 3.2 为什么内网 80 + 3000 没有 CORS 问题？
+
+常见疑问：前端走 Nginx **80** 端口，API 直连网关 **3000** 端口，端口不同，为什么没有 CORS 报错？
+
+#### 端口不同，确实不是「同源」
+
+浏览器同源策略要求 **协议 + 域名 + 端口** 三者完全相同：
+
+| 页面 | API | 是否同源 |
+|------|-----|----------|
+| `http://192.168.2.206:80` | `http://192.168.2.206:3000` | ❌ 不同源（端口不同） |
+
+内网场景并不是「没有跨域」，而是 **跨域被网关 CORS 配置兜住**，且 **没有触发私有网络访问（PNA）限制**。
+
+#### 原因一：网关已返回 CORS 响应头
+
+`hongguang-gateway` 中有全局 CORS 配置（`GlobalGatewayCorsConfig`），允许任意来源、任意方法、任意请求头：
+
+```java
+configuration.setAllowCredentials(true);
+configuration.addAllowedOrigin(CorsConfiguration.ALL);  // 允许 *
+configuration.addAllowedHeader(CorsConfiguration.ALL);
+configuration.addAllowedMethod(CorsConfiguration.ALL);
+```
+
+浏览器从 `:80` 页面请求 `:3000` 时，网关会在响应中带上 `Access-Control-Allow-Origin` 等头，浏览器校验通过后放行。前端 `request.js` 中 `withCredentials: false`，与网关返回 `*` 也兼容。
+
+#### 原因二：同属私网，不触发 PNA 限制
+
+公网报错中的 `more-private address space local` 来自 Chrome 的 **Private Network Access（私有网络访问）** 策略：
+
+| 场景 | 页面来源 | API 目标 | 浏览器行为 |
+|------|----------|----------|------------|
+| 内网 | `192.168.2.206:80`（私网） | `192.168.2.206:3000`（私网） | 同属 local 私网空间，**不拦截** |
+| 公网 | `221.193.232.137:8001`（公网） | `192.168.2.206:3000`（私网） | 公网 → 私网，**直接拦截** |
+
+内网是「私网页面访问私网 API」；公网是「公网页面访问内网 IP」——这是比 CORS 更底层的限制，**在 Nginx 上加 CORS 头也无法绕过**。
+
+#### 原因三：内网用户网络可达
+
+内网用户与 `192.168.2.206` 在同一局域网，浏览器可以直接连 `:3000`。公网用户无法路由到 `192.168.x.x`，即便没有 CORS 限制也会请求失败。
+
+#### 内网 vs 公网对比
+
+```text
+内网（80 页面 + 3000 API 直连）：
+  页面 :80 ──跨端口，但同私网──> API :3000
+              ↑
+        网关 CORS 放行 + 无 PNA 限制 + 网络可达  →  正常使用 ✅
+
+公网（8001 页面 + 3000 API 直连）：
+  页面 公网:8001 ──跨网段──> API 192.168.x.x:3000
+              ↑
+        PNA 直接拦截（CORS 配置无效）  →  登录失败 ❌
+```
+
+因此公网改造必须让 API 也走 Nginx 同源代理（`/api`），详见下一节。
 
 ---
 
