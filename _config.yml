@@ -43,18 +43,22 @@ render_drafts: false
 post_asset_folder: true
 relative_link: false
 future: true
+# Hexo 7+ 使用 syntax_highlighter；exclude_languages 让 ```mermaid 不被高亮包裹，供 Butterfly 渲染
+syntax_highlighter: highlight.js
 highlight:
-  enable: false
   line_number: true
   auto_detect: false
   tab_replace: ''
   wrap: true
   hljs: false
+  exclude_languages:
+    - mermaid
 prismjs:
-  enable: false
   preprocess: true
   line_number: true
   tab_replace: ''
+  exclude_languages:
+    - mermaid
 
 # Home page setting
 # path: Root path for your blogs index page. (default = '')

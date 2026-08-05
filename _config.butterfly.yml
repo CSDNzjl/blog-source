@@ -117,3 +117,15 @@ lazyload:
   enable: true
   field: site
   blur: true
+
+# Mermaid 流程图 / 时序图
+# https://github.com/mermaid-js/mermaid
+# 文章中可用 ```mermaid 代码块，或 {% mermaid %}...{% endmermaid %}
+mermaid:
+  enable: true
+  code_write: true
+  theme:
+    light: default
+    dark: dark
+  open_in_new_tab: true
+  zoom_pan: true
