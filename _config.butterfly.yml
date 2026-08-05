@@ -129,3 +129,11 @@ mermaid:
     dark: dark
   open_in_new_tab: true
   zoom_pan: true
+
+# CDN：mermaid.min.js 约 2.6MB，jsDelivr 国内常较慢；改为同站本地文件加速
+CDN:
+  internal_provider: local
+  third_party_provider: jsdelivr
+  version: true
+  option:
+    mermaid: /js/mermaid.min.js
