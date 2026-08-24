@@ -108,12 +108,12 @@ ngrok http 80
 
 ```text
 Session Status                online
-Account                       CSDNzjl (Plan: Free)
+Account                       <your-account> (Plan: Free)
 Version                       3.39.5
 Region                        Asia Pacific (ap)
 Latency                       133ms
 Web Interface                 http://127.0.0.1:4040
-Forwarding                    https://terrie-exhilarative-zain.ngrok-free.dev -> http://localhost:80
+Forwarding                    https://<your-subdomain>.ngrok-free.dev -> http://localhost:80
 
 Connections                   ttl     opn     rt1     rt5     p50     p90
                               0       0       0.00    0.00    0.00    0.00
@@ -124,14 +124,14 @@ Connections                   ttl     opn     rt1     rt5     p50     p90
 测试人员浏览器访问：
 
 ```text
-https://terrie-exhilarative-zain.ngrok-free.dev
+https://<your-subdomain>.ngrok-free.dev
 ```
 
 即可看到 **你本机正在运行的最新前端**，无需服务器上的旧 `dist`。
 
 ### 3.3 注意事项
 
-1. **API 仍指向打包配置中的网关地址**（如 `http://192.168.201.40:3000`），本地前端只是「页面壳子」更新；若改动涉及新接口路径，需保证网关与后端已部署对应版本。
+1. **API 仍指向打包配置中的网关地址**（如 `http://192.168.1.200:3000`），本地前端只是「页面壳子」更新；若改动涉及新接口路径，需保证网关与后端已部署对应版本。
 2. 开发机需 **能访问内网网关**（VPN 或同一局域网），否则页面能开但接口会失败。
 3. 联调结束后关闭 ngrok，避免误把临时地址当正式环境使用。
 4. 可通过 ngrok 本地控制台 `http://127.0.0.1:4040` 查看请求明细，便于排查。
@@ -181,11 +181,11 @@ spring:
   cloud:
     nacos:
       discovery:
-        ip: terrie-exhilarative-zain.ngrok-free.dev   # ngrok 分配的域名，不含 https://
+        ip: <your-subdomain>.ngrok-free.dev   # ngrok 分配的域名，不含 https://
         port: 443                                      # ngrok HTTPS 对外端口
         secure: true                                   # 使用 HTTPS
       config:
-        server-addr: kocel-fom-cloud-zayton-register:8848
+        server-addr: nacos-register:8848
         file-extension: yaml
         prefix: ${spring.application.name}
         enabled: true

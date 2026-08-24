@@ -294,7 +294,7 @@ curl -X POST http://localhost:8080/group1/delete \
 {
   "addr": ":8080",                    // 监听端口
   "peer_id": "2",                     // 集群节点ID（0-9）
-  "host": "http://192.168.0.36:8080", // 本机地址
+  "host": "http://127.0.0.1:8080", // 本机地址
   "group": "group1",                  // 组名
   "enable_distinct_file": true,       // 开启文件去重
   "rename_file": false,               // 是否自动重命名

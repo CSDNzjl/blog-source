@@ -65,7 +65,7 @@ https://oapi.dingtalk.com/robot/send?access_token=<YOUR_ACCESS_TOKEN>
 
 ### 2.2 在服务器上配置 Token（推荐）
 
-在部署用户（如 `ifom`）的 `~/.bashrc` 或各服务 `app.env` 中设置：
+在部署用户（如 `deploy`）的 `~/.bashrc` 或各服务 `app.env` 中设置：
 
 ```bash
 export DINGTALK_WEBHOOK="https://oapi.dingtalk.com/robot/send?access_token=<YOUR_ACCESS_TOKEN>"
@@ -77,10 +77,10 @@ export DINGTALK_WEBHOOK="https://oapi.dingtalk.com/robot/send?access_token=<YOUR
 
 ## 3. 目录与文件位置
 
-与现有部署结构一致（`/home/ifom/hongguang/`）：
+与现有部署结构一致（`/home/deploy/hongguang/`）：
 
 ```text
-/home/ifom/hongguang/
+/home/deploy/hongguang/
 ├── bin/
 │   ├── common.sh          # 已有：stop / start 公共逻辑
 │   └── notify.sh          # 新增：钉钉通知模块（本文提供）
@@ -102,11 +102,11 @@ export DINGTALK_WEBHOOK="https://oapi.dingtalk.com/robot/send?access_token=<YOUR
 
 ## 4. 新增通知模块：`bin/notify.sh`
 
-在服务器创建 `/home/ifom/hongguang/bin/notify.sh`：
+在服务器创建 `/home/deploy/hongguang/bin/notify.sh`：
 
 ```bash
 #!/usr/bin/env bash
-# /home/ifom/hongguang/bin/notify.sh
+# /home/deploy/hongguang/bin/notify.sh
 # 本项目专用的钉钉通知模块
 # 仅供 restart.sh 调用，不要直接执行
 
@@ -173,7 +173,7 @@ EOF
 赋予可执行权限（可选，因该文件仅被 `source`，非直接执行）：
 
 ```bash
-chmod +x /home/ifom/hongguang/bin/notify.sh
+chmod +x /home/deploy/hongguang/bin/notify.sh
 ```
 
 **消息模板说明：**
@@ -189,7 +189,7 @@ chmod +x /home/ifom/hongguang/bin/notify.sh
 
 ## 5. 改造各服务的 `restart.sh`
 
-以 **scheduling（排产）** 为例，路径：`/home/ifom/hongguang/scheduling/restart.sh`。  
+以 **scheduling（排产）** 为例，路径：`/home/deploy/hongguang/scheduling/restart.sh`。  
 其他微服务（`gateway`、`auth-server`、`form` 等）按同样方式改造各自目录下的 `restart.sh`。
 
 ```bash
@@ -254,7 +254,7 @@ fi
 若 `restart.sh` 为新建文件，需赋予可执行权限：
 
 ```bash
-cd /home/ifom/hongguang/scheduling
+cd /home/deploy/hongguang/scheduling
 chmod +x ./restart.sh
 ```
 

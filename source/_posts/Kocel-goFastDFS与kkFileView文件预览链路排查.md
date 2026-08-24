@@ -18,7 +18,7 @@ cover: /images/hongguang-logo.png
 
 > **适用读者**：实施、运维、全栈开发。  
 > **前置知识**：了解项目基本架构（Nginx + Gateway + Nacos + 微服务），可参考 [虹光项目：服务器部署架构与从零搭建指南](/2026/05/29/虹光项目：服务器部署架构与从零搭建指南/)、[kkFileView 文件在线预览服务入门指南](/2026/06/16/kkFileView文件在线预览服务入门指南/)。  
-> **环境**：局域网 `192.168.2.206`，公网 `221.193.232.137:8001`。
+> **环境**：局域网 `192.168.1.100`，公网 `<PUBLIC_IP>:8001`。
 
 ---
 
@@ -41,7 +41,7 @@ cover: /images/hongguang-logo.png
 |------|------|----------|
 | 前端 `FileUpload` | 上传、持有未保存元数据、发起预览/下载 | 业务站点 |
 | `hongguang-parameter` | 上传转发、拼预览 URL、代下载 | `/hongguang-parameter/file/*` |
-| goFastDFS | 文件二进制存储 | `http://192.168.2.206:8080`（内网） |
+| goFastDFS | 文件二进制存储 | `http://192.168.1.100:8080`（内网） |
 | kkFileView | 在线预览（TXT 直渲 / PDF·Office 转图等） | 内网 `8012`，对外经 `/FileServer/` |
 | Nginx | 反代前端、API、`/group1/`、`/FileServer/` | 局域网 `:80`、公网 `:8001` |
 
@@ -49,10 +49,10 @@ cover: /images/hongguang-logo.png
 
 | 配置项 | 位置 | 作用 | 推荐值（双入口） |
 |--------|------|------|------------------|
-| `spring.fastdfs-host` | Nacos | 后端/kkFileView **服务端**访问 goFastDFS 的根地址 | `http://192.168.2.206:8080`（保持内网） |
+| `spring.fastdfs-host` | Nacos | 后端/kkFileView **服务端**访问 goFastDFS 的根地址 | `http://192.168.1.100:8080`（保持内网） |
 | `base.url` | kkFileView `application.properties` | 拼预览页内资源（如 `0.jpg`）的对外根路径 | `/FileServer`（相对路径） |
 | `previewPage` / `previewDecodePage` | 系统默认参数 | 预览入口页 | `/FileServer/onlinePreview` |
-| Nginx `/group1/` | Nginx | 浏览器侧访问存储文件 | 反代到 `192.168.2.206:8080/group1/` |
+| Nginx `/group1/` | Nginx | 浏览器侧访问存储文件 | 反代到 `192.168.1.100:8080/group1/` |
 | Nginx `/FileServer/` | Nginx | 浏览器侧访问预览服务 | 反代到 `127.0.0.1:8012/` |
 
 ---
@@ -126,7 +126,7 @@ sequenceDiagram
        ?path=&fileName=&secretKey=
   → FileUploadUtils.preview：
        1) realUrl = fastdfs-host + path
-          例：http://192.168.2.206:8080/group1/default/.../a.pdf
+          例：http://192.168.1.100:8080/group1/default/.../a.pdf
        2) encodeUrl = Base64.urlSafe(realUrl)
        3) 读系统参数 previewPage（相对化后默认 /FileServer/onlinePreview）
        4) 返回：
@@ -141,8 +141,8 @@ sequenceDiagram
        └─ Word：依赖 LibreOffice 转 PDF/图后再预览
   → 页面内资源地址 = base.url + /{id}/0.jpg
        当 base.url=/FileServer 时：
-       局域网 → http://192.168.2.206/FileServer/{id}/0.jpg
-       公网   → http://221.193.232.137:8001/FileServer/{id}/0.jpg
+       局域网 → http://192.168.1.100/FileServer/{id}/0.jpg
+       公网   → http://<PUBLIC_IP>:8001/FileServer/{id}/0.jpg
 ```
 
 **Base64 说明：** 编码的是「完整可下载 HTTP URL」，不是单独 path；Base64 仅为安全塞入查询参数，不是加密。kkFileView 必须能访问解码后的地址。
@@ -184,12 +184,12 @@ sequenceDiagram
 ─────────────────────────────────────────────────────────
 /                         → 前端静态 dist（SPA）
 /api/                     → 后端网关/API（如 :3000）
-/group1/**                → http://192.168.2.206:8080/group1/
+/group1/**                → http://192.168.1.100:8080/group1/
 /FileServer/**            → http://127.0.0.1:8012/   （注意去掉 /FileServer 前缀）
 /hongguang-parameter/**   → 经网关到 parameter 服务（以实际网关配置为准）
 ```
 
-公网入口 `http://221.193.232.137:8001/` 转发到 2.206 时，须保证实际命中的 server 块同样具备 `/group1/`、`/FileServer/`，且浏览器地址栏的 host:port 与反代入口一致（避免「浏览器以为是 8001、实际打到 80」导致 Host/链接错乱）。
+公网入口 `http://<PUBLIC_IP>:8001/` 转发到内网机时，须保证实际命中的 server 块同样具备 `/group1/`、`/FileServer/`，且浏览器地址栏的 host:port 与反代入口一致（避免「浏览器以为是 8001、实际打到 80」导致 Host/链接错乱）。
 
 ---
 
@@ -227,13 +227,13 @@ kkFileView 会本地缓存转换结果（`file.dir`），默认定时清理；�
 - 页面内图片请求变成：
 
 ```text
-http://192.168.2.206/{id}/0.jpg          ← 错误（缺 /FileServer，落到 80 根路径）
+http://192.168.1.100/{id}/0.jpg          ← 错误（缺 /FileServer，落到 80 根路径）
 ```
 
 而预览页本身是：
 
 ```text
-http://192.168.2.206/FileServer/onlinePreview?...
+http://192.168.1.100/FileServer/onlinePreview?...
 ```
 
 磁盘有图 ≠ 浏览器请求的 URL 能打到 kkFileView。
@@ -262,19 +262,19 @@ http://{当前访问Host}/FileServer/{id}/0.jpg
 
 **现象 / 风险**
 
-- 局域网：`base.url = http://192.168.2.206/FileServer` 可用。
-- 公网：`http://221.193.232.137:8001/` → 2.206；若 `base.url` 写死局域网 IP，公网用户加载 `0.jpg` 失败。
+- 局域网：`base.url = http://192.168.1.100/FileServer` 可用。
+- 公网：`http://<PUBLIC_IP>:8001/` → 内网机；若 `base.url` 写死局域网 IP，公网用户加载 `0.jpg` 失败。
 - 若把 `fastdfs-host` 改成公网，后端/kkFileView 服务端取文件可能失败或不稳定。
 
 **解决方案（推荐组合）**
 
 | 项 | 做法 |
 |----|------|
-| Nacos `fastdfs-host` | **保持** `http://192.168.2.206:8080`（仅服务端访问） |
+| Nacos `fastdfs-host` | **保持** `http://192.168.1.100:8080`（仅服务端访问） |
 | kkFileView `base.url` | **`/FileServer`**（相对路径，随访问入口变化） |
 | 系统预览参数 | `/FileServer/onlinePreview`（相对路径） |
 | Nginx | 局域网与公网入口均反代 `/group1/`、`/FileServer/` |
-| 前端 | 优先 `/file/preview`、`/file/download`；避免公网用户直接打开 `http://192.168.2.206:8080/group1/...` 绝对直链 |
+| 前端 | 优先 `/file/preview`、`/file/download`；避免公网用户直接打开 `http://192.168.1.100:8080/group1/...` 绝对直链 |
 
 **为何可行（职责分离）**
 
@@ -284,7 +284,7 @@ http://{当前访问Host}/FileServer/{id}/0.jpg
 | 用户浏览器打开预览页与 `0.jpg` | 当前域名下的 `/FileServer/...` | 局域网、公网各自解析到可通的入口 |
 | 用户经 API 下载 | 业务下载接口 → 后端再访内网 DFS | 浏览器不直连 `:8080` |
 
-相对 `base.url` 已在 2.206 环境验证可用，是双入口并存的关键。
+相对 `base.url` 已在该内网环境验证可用，是双入口并存的关键。
 
 ---
 
@@ -307,14 +307,14 @@ base.url = /FileServer
 
 ```yaml
 spring:
-  fastdfs-host: http://192.168.2.206:8080
+  fastdfs-host: http://192.168.1.100:8080
 ```
 
 ### 5.3 Nginx（两入口均需具备）
 
 ```nginx
 location /group1/ {
-    proxy_pass http://192.168.2.206:8080/group1/;
+    proxy_pass http://192.168.1.100:8080/group1/;
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -337,10 +337,10 @@ location /FileServer/ {
 ## 6. 验证清单
 
 1. **局域网**打开站点 → 上传 TXT/PDF → 未保存即可预览、下载 → 保存后再打开仍正常。  
-2. **公网** `http://221.193.232.137:8001/` 重复上述步骤。  
+2. **公网** `http://<PUBLIC_IP>:8001/` 重复上述步骤。  
 3. 预览 PDF 时 Network 中 `0.jpg` 应为：  
-   - 局域网：`http://192.168.2.206/FileServer/{id}/0.jpg`  
-   - 公网：`http://221.193.232.137:8001/FileServer/{id}/0.jpg`  
+   - 局域网：`http://192.168.1.100/FileServer/{id}/0.jpg`  
+   - 公网：`http://<PUBLIC_IP>:8001/FileServer/{id}/0.jpg`  
    且 Status = 200，Preview 可见内容。  
 4. 手动打开 Base64 解码后的 `fastdfs-host + path`，确认源文件可下载（验证存储与内网连通）。  
 5. Word 预览单独验证 LibreOffice / 字体（与本次 PDF 灰屏根因不同）。

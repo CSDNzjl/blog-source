@@ -14,7 +14,7 @@ cover: /images/hongguang-logo.png
 ---
 本文说明当前 **hongguang（虹光铸造全生命周期管理系统）** 在服务器上如何协同工作，以及若从零搭建一套类似技术栈网站时的完整流程。
 
-> 说明：访问地址 `192.168.201.40:93` 中的 **93 端口** 属于服务器上的 **Web 服务器（通常为 Nginx）** 配置，不在本仓库源码中；下文根据现有前端打包方式与常见部署实践进行说明。
+> 说明：访问地址 `192.168.1.200:93` 中的 **93 端口** 属于服务器上的 **Web 服务器（通常为 Nginx）** 配置，不在本仓库源码中；下文根据现有前端打包方式与常见部署实践进行说明。
 
 ---
 
@@ -26,7 +26,7 @@ cover: /images/hongguang-logo.png
 └──────┬──────┘                               └──────────────────────────┘
        │
        │  AJAX：VUE_APP_BASE_API（打包时写入）
-       │  例：http://192.168.201.40:3000/hongguang-xxx/...
+       │  例：http://192.168.1.200:3000/hongguang-xxx/...
        ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
 │  Spring Cloud Gateway（hongguang-gateway）  端口 3000                      │
@@ -62,7 +62,7 @@ cover: /images/hongguang-logo.png
 
 ### 2.1 发生了什么
 
-1. 用户在浏览器输入：`http://192.168.201.40:93`
+1. 用户在浏览器输入：`http://192.168.1.200:93`
 2. 请求到达服务器 **93 端口** 上的 Web 服务（一般为 **Nginx**）。
 3. Nginx 将站点根目录指向前端 **`dist` 目录**（打包后的 `index.html`、`static/` 等）。
 4. 浏览器加载 SPA，后续路由由 Vue Router 在浏览器内完成（`history` 或 `hash` 模式需与 Nginx 的 `try_files` 配置一致）。
@@ -89,7 +89,7 @@ npm run build:prod
 ```nginx
 server {
     listen 93;
-    server_name 192.168.201.40;
+    server_name 192.168.1.200;
 
     root /usr/share/nginx/html/hongguang;   # 此处放 dist 内容
     index index.html;
@@ -119,7 +119,7 @@ server {
 
 ```properties
 ENV = 'production'
-VUE_APP_BASE_API = 'http://192.168.201.40:3000'
+VUE_APP_BASE_API = 'http://192.168.1.200:3000'
 ```
 
 执行 `npm run build:prod` 时，Vue CLI 会把 `VUE_APP_BASE_API` **编译进** JS  bundle。
@@ -132,7 +132,7 @@ VUE_APP_BASE_API = 'http://192.168.201.40:3000'
 baseURL: process.env.VUE_APP_BASE_API
 ```
 
-因此所有接口请求的「主机 + 端口」都是 **`http://192.168.201.40:3000`**（网关），而不是各个微服务的真实端口。
+因此所有接口请求的「主机 + 端口」都是 **`http://192.168.1.200:3000`**（网关），而不是各个微服务的真实端口。
 
 ### 3.3 业务 API 只写「服务路径前缀」
 
@@ -150,7 +150,7 @@ baseURL: process.env.VUE_APP_BASE_API
 
 ```javascript
 // 实际请求 URL =
-// http://192.168.201.40:3000 + /hongguang-auth-server/oauth/token
+// http://192.168.1.200:3000 + /hongguang-auth-server/oauth/token
 url: define.authService + '/oauth/token'
 ```
 
@@ -158,7 +158,7 @@ url: define.authService + '/oauth/token'
 
 ```
 浏览器
-  → POST http://192.168.201.40:3000/hongguang-auth-server/oauth/token
+  → POST http://192.168.1.200:3000/hongguang-auth-server/oauth/token
 网关 hongguang-gateway (:3000)
   → 根据路径 /hongguang-auth-server/** 匹配路由
   → 从 Nacos 发现 hongguang-auth-server 实例
@@ -182,8 +182,8 @@ auth-server
 
 少数页面在代码中写死了其他服务地址（未走统一网关），例如：
 
-- 积木报表：`http://192.168.201.40:83/jmreport/...`
-- BI 大屏：`http://192.168.201.40:8370/...`
+- 积木报表：`http://192.168.1.200:83/jmreport/...`
+- BI 大屏：`http://192.168.1.200:8370/...`
 
 这些需单独部署对应服务并在防火墙放行端口。
 
@@ -205,7 +205,7 @@ spring:
   cloud:
     nacos:
       config:
-        server-addr: kocel-fom-cloud-zayton-register:8848
+        server-addr: nacos-register:8848
         namespace: hongguang
         group: HONGGUANG_GROUP
         prefix: ${spring.application.name}
@@ -219,7 +219,7 @@ server:
 - `druid-common.yaml`（数据源）
 - `logback-common.yaml`（日志）
 
-`server-addr` 中的主机名 `kocel-fom-cloud-zayton-register` 一般在服务器 `/etc/hosts` 或 Docker 网络中解析到 **192.168.201.40:8848**（以实际运维为准）。
+`server-addr` 中的主机名 `nacos-register` 一般在服务器 `/etc/hosts` 或 Docker 网络中解析到 **192.168.1.200:8848**（以实际运维为准）。
 
 ### 4.2 网关路由规则（概念）
 
@@ -236,7 +236,7 @@ Spring Cloud Gateway 通常配置为：
 服务间通过 **服务名** 调用（经 Nacos 解析），例如 OAuth 用户信息：
 
 ```yaml
-security.oauth2.resource.user-info-uri: http://kocel-fom-cloud-zayton-gateway:3000/hongguang-auth-server/user
+security.oauth2.resource.user-info-uri: http://internal-gateway:3000/hongguang-auth-server/user
 ```
 
 即：内部也经网关访问认证服务，而不是写死 IP。
@@ -250,7 +250,7 @@ security.oauth2.resource.user-info-uri: http://kocel-fom-cloud-zayton-gateway:30
 ### 5.1 目标目录
 
 ```
-/home/ifom/hongguang/          # 部署根目录（INSTALL.txt 约定）
+/home/deploy/hongguang/          # 部署根目录（INSTALL.txt 约定）
 ├── gateway/
 │   ├── hongguang-gateway-1.0.0-SNAPSHOT.jar
 │   ├── app.env
@@ -295,7 +295,7 @@ SPRING_PROFILES=dev    # 或 prod，决定加载哪套 Nacos 配置
 4. …
 
 ```bash
-cd /home/ifom/hongguang
+cd /home/deploy/hongguang
 chmod +x start-all.sh stop-all.sh
 ./start-all.sh          # 按顺序启动全部
 ./status-all.sh         # 查看 PID
@@ -418,7 +418,7 @@ java -Xms512m -Xmx1024m -jar hongguang-gateway-1.0.0-SNAPSHOT.jar --spring.profi
 
 生产环境一般 **前后端不同端口**（93 vs 3000），网关需配置 CORS（本仓库 `GlobalGatewayCorsConfig` 等）。若仍报错，检查网关是否启动、是否走了网关而非直连微服务端口。
 
-### Q4：`kocel-fom-cloud-zayton-register` 解析失败？
+### Q4：`nacos-register` 解析失败？
 
 在服务器配置 hosts 或 Docker 网络别名，使其指向 Nacos 实际 IP。各服务 `bootstrap.yaml` 中的 `server-addr` 需与现网一致。
 
@@ -448,7 +448,7 @@ java -Xms512m -Xmx1024m -jar hongguang-gateway-1.0.0-SNAPSHOT.jar --spring.profi
 | `:93` 是什么？ | 对外的 **前端静态站点**（Nginx + dist） |
 | 前端如何知道后端地址？ | **打包时** 通过 `VUE_APP_BASE_API` 指向 **网关 :3000**，业务 URL 再加 `/hongguang-服务名/...` |
 | Nacos 管什么？ | 微服务 **注册发现** + **集中配置**；前端 **不连接** Nacos |
-| 后端如何部署？ | 各模块打成 JAR，放到 `/home/ifom/hongguang/{服务名}/`，脚本启停 |
+| 后端如何部署？ | 各模块打成 JAR，放到 `/home/deploy/hongguang/{服务名}/`，脚本启停 |
 | 请求如何到达具体服务？ | 浏览器 → 网关按路径转发 → Nacos 查实例 → 对应 JAR |
 
-按本文流程，可以从零复现一套与当前虹光项目同架构的 Web 系统；具体 IP、目录、Nginx 路径以你们服务器实际运维配置为准，替换文档中的 `192.168.201.40` 即可。
+按本文流程，可以从零复现一套与当前虹光项目同架构的 Web 系统；具体 IP、目录、Nginx 路径以你们服务器实际运维配置为准，替换文档中的 `192.168.1.200` 即可。

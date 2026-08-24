@@ -27,16 +27,16 @@ cover: /images/hongguang-logo.png
 
 | 组件 | 地址 | 说明 |
 |------|------|------|
-| 前端 Nginx | `192.168.2.206:80` | 静态资源 `dist/`，内网用户日常访问 |
-| 公网映射 Nginx | `192.168.2.206:8001` | 与 80 端口逻辑相同，供公网入口转发 |
-| API 网关 | `192.168.2.206:3000` | Spring Cloud Gateway，仅内网可达 |
+| 前端 Nginx | `192.168.1.100:80` | 静态资源 `dist/`，内网用户日常访问 |
+| 公网映射 Nginx | `192.168.1.100:8001` | 与 80 端口逻辑相同，供公网入口转发 |
+| API 网关 | `192.168.1.100:3000` | Spring Cloud Gateway，仅内网可达 |
 
 ### 1.2 公网入口
 
 | 项目 | 值 |
 |------|-----|
-| 公网 IP | `221.193.232.137:8001` |
-| 转发规则 | 公网 `:8001` → 局域网 `192.168.2.206:8001` |
+| 公网 IP | `<PUBLIC_IP>:8001` |
+| 转发规则 | 公网 `:8001` → 局域网 `192.168.1.100:8001` |
 
 公网映射只负责把流量送到 Nginx 8001 端口，**不会**自动把 API 请求代理到网关 3000——后者需要 Nginx 配置 + 前端打包配合完成。
 
@@ -47,13 +47,14 @@ cover: /images/hongguang-logo.png
 auth-server 启动前需加载 License 证书，配置位于 `bootstrap.yaml`：
 
 ```yaml
+# subject / storePass 为占位符，真实口令不要写进公开文档
 springboot:
   license:
     verify:
-      subject: kocel
+      subject: <LICENSE_SUBJECT>
       publicAlias: publiccert
       publicKeysStorePath: /publicCerts.store
-      storePass: kocel123456
+      storePass: <STORE_PASS>
       licensePath: /home/license/license.lic
 ```
 
@@ -67,17 +68,17 @@ springboot:
 
 ## 3. 内网访问时的请求链路
 
-内网用户通过 `192.168.2.206:80` 访问时，前端在打包时写死了网关地址（`.env.production`）：
+内网用户通过 `192.168.1.100:80` 访问时，前端在打包时写死了网关地址（`.env.production`）：
 
 ```properties
-VUE_APP_BASE_API = 'http://192.168.2.206:3000'
+VUE_APP_BASE_API = 'http://192.168.1.100:3000'
 ```
 
 **完整请求示例：**
 
 ```text
 浏览器
-  → GET http://192.168.2.206:3000/hongguang-parameter/BaseTableSelfDefinedHead/getByParams?n=...
+  → GET http://192.168.1.100:3000/hongguang-parameter/BaseTableSelfDefinedHead/getByParams?n=...
 网关 (:3000)
   → 按路径前缀 /hongguang-parameter/ 匹配路由
   → 从 Nacos 发现 hongguang-parameter 实例
@@ -102,7 +103,7 @@ VUE_APP_BASE_API = 'http://192.168.2.206:3000'
 
 | 页面 | API | 是否同源 |
 |------|-----|----------|
-| `http://192.168.2.206:80` | `http://192.168.2.206:3000` | ❌ 不同源（端口不同） |
+| `http://192.168.1.100:80` | `http://192.168.1.100:3000` | ❌ 不同源（端口不同） |
 
 内网场景并不是「没有跨域」，而是 **跨域被网关 CORS 配置兜住**，且 **没有触发私有网络访问（PNA）限制**。
 
@@ -125,14 +126,14 @@ configuration.addAllowedMethod(CorsConfiguration.ALL);
 
 | 场景 | 页面来源 | API 目标 | 浏览器行为 |
 |------|----------|----------|------------|
-| 内网 | `192.168.2.206:80`（私网） | `192.168.2.206:3000`（私网） | 同属 local 私网空间，**不拦截** |
-| 公网 | `221.193.232.137:8001`（公网） | `192.168.2.206:3000`（私网） | 公网 → 私网，**直接拦截** |
+| 内网 | `192.168.1.100:80`（私网） | `192.168.1.100:3000`（私网） | 同属 local 私网空间，**不拦截** |
+| 公网 | `<PUBLIC_IP>:8001`（公网） | `192.168.1.100:3000`（私网） | 公网 → 私网，**直接拦截** |
 
 内网是「私网页面访问私网 API」；公网是「公网页面访问内网 IP」——这是比 CORS 更底层的限制，**在 Nginx 上加 CORS 头也无法绕过**。
 
 #### 原因三：内网用户网络可达
 
-内网用户与 `192.168.2.206` 在同一局域网，浏览器可以直接连 `:3000`。公网用户无法路由到 `192.168.x.x`，即便没有 CORS 限制也会请求失败。
+内网用户与 `192.168.1.100` 在同一局域网，浏览器可以直接连 `:3000`。公网用户无法路由到 `192.168.x.x`，即便没有 CORS 限制也会请求失败。
 
 #### 内网 vs 公网对比
 
@@ -156,7 +157,7 @@ configuration.addAllowedMethod(CorsConfiguration.ALL);
 
 ### 4.1 为什么不能直接沿用内网配置
 
-若公网用户访问 `http://221.193.232.137:8001`，而 `dist` 中 API 仍指向 `http://192.168.2.206:3000`，会出现两类问题：
+若公网用户访问 `http://<PUBLIC_IP>:8001`，而 `dist` 中 API 仍指向 `http://192.168.1.100:3000`，会出现两类问题：
 
 | 问题 | 表现 | 原因 |
 |------|------|------|
@@ -171,8 +172,8 @@ configuration.addAllowedMethod(CorsConfiguration.ALL);
 
 ```text
 浏览器（公网）
-  → http://221.193.232.137:8001/api/hongguang-xxx/...
-Nginx :8001（192.168.2.206）
+  → http://<PUBLIC_IP>:8001/api/hongguang-xxx/...
+Nginx :8001（192.168.1.100）
   → http://127.0.0.1:3000/hongguang-xxx/...   （服务端内部转发，浏览器不参与）
 Gateway :3000
   → Nacos 路由到具体微服务
@@ -207,10 +208,10 @@ VUE_APP_BASE_API = '/api'
 
 ```properties
 # ❌ 公网页面 + 内网 API，浏览器会拦截
-VUE_APP_BASE_API = 'http://192.168.2.206:3000'
+VUE_APP_BASE_API = 'http://192.168.1.100:3000'
 
 # ❌ 换域名/IP 就要重新打包
-VUE_APP_BASE_API = 'http://221.193.232.137:8001/api'
+VUE_APP_BASE_API = 'http://<PUBLIC_IP>:8001/api'
 ```
 
 ### 5.2 重新打包并部署
@@ -286,7 +287,7 @@ server {
     }
 
     location /FileServer/ {
-        proxy_pass http://192.168.201.40:8080/;
+        proxy_pass http://192.168.1.200:8080/;
     }
 }
 ```
@@ -399,12 +400,12 @@ sudo tail -n 50 /var/log/nginx/error.log
 
 ```text
 1. 浏览器发起：
-   http://221.193.232.137:8001/api/hongguang-parameter/BaseTableSelfDefinedHead/getByParams?n=1780640478
+   http://<PUBLIC_IP>:8001/api/hongguang-parameter/BaseTableSelfDefinedHead/getByParams?n=...
 
-2. 公网映射 → 192.168.2.206:8001
+2. 公网映射 → 192.168.1.100:8001
 
 3. Nginx 匹配 location /api/，转发到：
-   http://127.0.0.1:3000/hongguang-parameter/BaseTableSelfDefinedHead/getByParams?n=1780640478
+   http://127.0.0.1:3000/hongguang-parameter/BaseTableSelfDefinedHead/getByParams?n=...
 
 4. Gateway 按 /hongguang-parameter/ 前缀路由到对应微服务
 ```
@@ -412,7 +413,7 @@ sudo tail -n 50 /var/log/nginx/error.log
 登录接口同理：
 
 ```text
-http://221.193.232.137:8001/api/hongguang-auth-server/oauth/token
+http://<PUBLIC_IP>:8001/api/hongguang-auth-server/oauth/token
   → 127.0.0.1:3000/hongguang-auth-server/oauth/token
 ```
 
@@ -422,10 +423,10 @@ http://221.193.232.137:8001/api/hongguang-auth-server/oauth/token
 
 ### 7.1 如何确认改造生效
 
-1. 浏览器打开 `http://221.193.232.137:8001`，F12 → **Network**；
+1. 浏览器打开 `http://<PUBLIC_IP>:8001`，F12 → **Network**；
 2. 登录或刷新页面，检查 API 请求 URL：
-   - ✅ 正确：`http://221.193.232.137:8001/api/hongguang-xxx/...`
-   - ❌ 仍是旧包：`http://192.168.2.206:3000/hongguang-xxx/...`
+   - ✅ 正确：`http://<PUBLIC_IP>:8001/api/hongguang-xxx/...`
+   - ❌ 仍是旧包：`http://192.168.1.100:3000/hongguang-xxx/...`
 3. 若仍是内网地址，说明 `dist` 未更新——检查是否执行了 `build:prod` 以及上传目录是否正确。
 
 ### 7.2 常见报错对照
@@ -449,8 +450,8 @@ http://221.193.232.137:8001/api/hongguang-auth-server/oauth/token
 
 | 对比项 | 内网访问 (:80) | 公网访问 (:8001) |
 |--------|----------------|------------------|
-| 页面入口 | `192.168.2.206:80` | `221.193.232.137:8001` |
-| `VUE_APP_BASE_API` | 可写 `http://192.168.2.206:3000` | 必须写 `/api` |
+| 页面入口 | `192.168.1.100:80` | `<PUBLIC_IP>:8001` |
+| `VUE_APP_BASE_API` | 可写 `http://192.168.1.100:3000` | 必须写 `/api` |
 | API 实际路径 | 直连网关 3000 | 经 Nginx `/api/` 代理到 3000 |
 | 是否需要 CORS | 否（或网关统一处理） | 否（同源，无需额外 CORS） |
 | 打包要求 | 改 IP 后需 rebuild | 改 `/api` 后需 rebuild |
